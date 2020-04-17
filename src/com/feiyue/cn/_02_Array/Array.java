@@ -1,15 +1,15 @@
 package com.feiyue.cn._02_Array;
 
 public class Array<E> {
-    private E[] data;
+    private E[] elements;
     private int size = 0;
 
     private static final int ELEMENT_NOT_FOUND = -1;
     private static final int DEFAULT_CAPACITY = 10;
 
     public Array(int capacity) {
-        data = (E[]) new Object[capacity];
-        size = 0;
+        capacity = (capacity < DEFAULT_CAPACITY) ? DEFAULT_CAPACITY : capacity;
+        elements = (E[]) new Object[capacity];
     }
 
     public Array() {
@@ -25,54 +25,54 @@ public class Array<E> {
     }
 
     // 在index索引的位置插入一个新元素e
-    public void add(int index, E e) {
+    public void add(int index, E element) {
         //if (size == data.length) throw new IllegalArgumentException("Add failed. Array is full.");
-        if (size == data.length) resize(data.length << 1);
+        if (size == elements.length) resize(elements.length << 1);
         if (index < 0 || index > size) throw new IllegalArgumentException("Add failed. Require index >= 0 and index <= size.");
 
         for (int i = size - 1; i >= index; i--) {
-            data[i + 1] = data[i];
+            elements[i + 1] = elements[i];
         }
-        data[index] = e;
+        elements[index] = element;
         size++;
     }
 
-    public void addLast(E e) {
-        add(size, e);
+    public void addLast(E element) {
+        add(size, element);
 
     }
 
-    public void addFirst(E e) {
-        add(0, e);
+    public void addFirst(E element) {
+        add(0, element);
 
     }
 
     // 获取index索引位置的元素
     public E get(int index) {
         if (index < 0 || index >= size) throw new IllegalArgumentException("Get failed. Require index >= 0 and index <= size.");
-        return data[index];
+        return elements[index];
 
     }
 
-    public E set(int index, E e) {
+    public E set(int index, E element) {
         if (index < 0 || index >= size) throw new IllegalArgumentException("Get failed. Require index >= 0 and index <= size.");
-        E old = data[index];
-        data[index] = e;
+        E old = elements[index];
+        elements[index] = element;
         return old;
     }
 
     // 查找数组中是否有元素e
-    public boolean contains(E e) {
+    public boolean contains(E element) {
         for (int i = 0; i < size; i++) {
-            return data[i].equals(e);
+            return elements[i].equals(element);
         }
         return false;
     }
 
     // 查找数组中元素e所在的索引，如果不存在元素e，则返回-1
-    public int find(E e) {
+    public int find(E element) {
         for (int i = 0; i < size; i++) {
-            if (data[i].equals(e)) return i;
+            if (elements[i].equals(element)) return i;
         }
         return ELEMENT_NOT_FOUND;
     }
@@ -80,13 +80,13 @@ public class Array<E> {
     // 从数组中删除index位置的元素, 返回删除的元素
     public E remove(int index) {
         if (index < 0 || index >= size) throw new IllegalArgumentException("Remove failed. Index is illegal.");
-        E old = data[index];
+        E old = elements[index];
         for (int i = index; i <= size - 1; i++) {
-            data[i] = data[i + 1];
+            elements[i] = elements[i + 1];
         }
         size--;
-        if (size == data.length / 4 && data.length != 0)
-            resize(data.length / 2);
+        if (size == elements.length / 4 && elements.length != 0)
+            resize(elements.length / 2);
 
         return old;
     }
@@ -109,10 +109,10 @@ public class Array<E> {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append(String.format("Array: size = %d , capacity = %d \n", size, data.length));
+        sb.append(String.format("Array: size = %d , capacity = %d \n", size, elements.length));
         sb.append("[");
         for (int i = 0; i < size; i++) {
-            sb.append(data[i]);
+            sb.append(elements[i]);
             if (i != size -1) sb.append(",");
         }
         sb.append("]");
@@ -122,10 +122,10 @@ public class Array<E> {
 
     // 将数组空间的容量变成newCapacity大小
     private void resize(int newCapacity) {
-        E[] newData = (E[]) new Object[newCapacity];
+        E[] newEles = (E[]) new Object[newCapacity];
         for (int i = 0; i < size; i++) {
-            newData[i] = data[i];
+            newEles[i] = elements[i];
         }
-        data = newData;
+        elements = newEles;
     }
 }
