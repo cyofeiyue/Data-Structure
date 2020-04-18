@@ -1,4 +1,4 @@
-package com.feiyue.cn._02_Array;
+package com.feiyue.cn._03_Stack_and_Queues;
 
 public class Array<E> {
     private E[] elements;
@@ -130,7 +130,7 @@ public class Array<E> {
     }
 
     public E removeFirst() {
-        return remove(0);
+       return remove(0);
 
     }
 
@@ -141,7 +141,7 @@ public class Array<E> {
     // 从数组中删除元素e
     public void removeElement(E element) {
         int index = index(element);
-        if (index != ELEMENT_NOT_FOUND)  remove(index);
+        if (index != ELEMENT_NOT_FOUND) remove(index);
     }
 
     @Override
