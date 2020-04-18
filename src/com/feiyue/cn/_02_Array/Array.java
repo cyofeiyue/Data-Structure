@@ -2,6 +2,10 @@ package com.feiyue.cn._02_Array;
 
 public class Array<E> {
     private E[] elements;
+
+    /**
+     * 元素数量
+     */
     private int size = 0;
 
     private static final int ELEMENT_NOT_FOUND = -1;
@@ -20,21 +24,65 @@ public class Array<E> {
         return size;
     }
 
+    public int getCapacity() {
+        return elements.length;
+    }
     public boolean isEmpty() {
         return size == 0;
     }
 
-    // 在index索引的位置插入一个新元素e
-    public void add(int index, E element) {
-        //if (size == data.length) throw new IllegalArgumentException("Add failed. Array is full.");
-        if (size == elements.length) resize(elements.length << 1);
-        if (index < 0 || index > size) throw new IllegalArgumentException("Add failed. Require index >= 0 and index <= size.");
+    /**
+     * 清除所有元素
+     */
+    public void clear() {
+        for (int i = 0; i < size; i++) {
+            elements[i] = null;
+        }
+        size = 0;
+    }
 
+    /**
+     * 在index索引的位置插入一个新元素e
+     * @param index
+     * @param element
+     */
+    public void add(int index, E element) {
+        /*
+         * 最好：O(1)
+         * 最坏：O(n)
+         * 平均：O(n)
+         */
+        if (index < 0 || index > size) throw new IllegalArgumentException("Add failed. Require index >= 0 and index <= size.");
+        ensureCapacity(size + 1);
         for (int i = size - 1; i >= index; i--) {
             elements[i + 1] = elements[i];
         }
         elements[index] = element;
         size++;
+    }
+
+    /**
+     * 从数组中删除index位置的元素, 返回删除的元素
+     * @param index
+     * @return
+     */
+    public E remove(int index) {
+        /*
+         * 最好：O(1)
+         * 最坏：O(n)
+         * 平均：O(n)
+         */
+        if (index < 0 || index >= size) throw new IllegalArgumentException("Remove failed. Index is illegal.");
+        E old = elements[index];
+        for (int i = index; i <= size - 1; i++) {
+            elements[i] = elements[i + 1];
+        }
+
+        elements[--size] = null;
+        if (size == elements.length / 4 && elements.length != 0)
+            trim();
+
+        return old;
     }
 
     public void addLast(E element) {
@@ -63,32 +111,22 @@ public class Array<E> {
 
     // 查找数组中是否有元素e
     public boolean contains(E element) {
-        for (int i = 0; i < size; i++) {
-            return elements[i].equals(element);
-        }
-        return false;
+        return  index(element) != ELEMENT_NOT_FOUND;
     }
 
     // 查找数组中元素e所在的索引，如果不存在元素e，则返回-1
-    public int find(E element) {
-        for (int i = 0; i < size; i++) {
-            if (elements[i].equals(element)) return i;
+    private int index(E element) {
+        if (element == null) {
+            for (int i = 0; i < size; i++) {
+                if (elements[i] == null) return i;
+            }
+        } else {
+            for (int i = 0; i < size; i++) {
+                if (elements[i].equals(element)) return i;
+            }
         }
+
         return ELEMENT_NOT_FOUND;
-    }
-
-    // 从数组中删除index位置的元素, 返回删除的元素
-    public E remove(int index) {
-        if (index < 0 || index >= size) throw new IllegalArgumentException("Remove failed. Index is illegal.");
-        E old = elements[index];
-        for (int i = index; i <= size - 1; i++) {
-            elements[i] = elements[i + 1];
-        }
-        size--;
-        if (size == elements.length / 4 && elements.length != 0)
-            resize(elements.length / 2);
-
-        return old;
     }
 
     public void removeFirst() {
@@ -101,8 +139,8 @@ public class Array<E> {
     }
 
     // 从数组中删除元素e
-    public void removeElement(E e) {
-        int index = find(e);
+    public void removeElement(E element) {
+        int index = index(element);
         if (index != ELEMENT_NOT_FOUND) remove(index);
     }
 
@@ -120,12 +158,42 @@ public class Array<E> {
         return  sb.toString();
     }
 
-    // 将数组空间的容量变成newCapacity大小
-    private void resize(int newCapacity) {
-        E[] newEles = (E[]) new Object[newCapacity];
+    /**
+     * 保证要有capacity的容量
+     * @param capacity
+     */
+    private void ensureCapacity(int capacity) {
+        int oldCapacity = elements.length;
+        if (oldCapacity >= capacity) return;
+        //1.5倍
+        int newCapacity = oldCapacity + oldCapacity << 1;
+        E[] newElements = (E[]) new Object[newCapacity];
         for (int i = 0; i < size; i++) {
-            newEles[i] = elements[i];
+           newElements[i] = elements[i];
         }
-        elements = newEles;
+        //elements 指向新数组
+        elements = newElements;
+        System.out.println(oldCapacity + "扩容为" + newCapacity);
+    }
+
+
+    private void trim() {
+
+        //比如原来有30
+        int oldCapacity = elements.length;
+        //变为15
+        int newCapacity = oldCapacity >> 1;
+
+        //todo 极其重要
+        if (size >= newCapacity && oldCapacity <= DEFAULT_CAPACITY) return;
+
+        E[] newElements = (E[]) new Object[newCapacity];
+        for (int i = 0; i < size; i++) {
+            newElements[i] = elements[i];
+        }
+
+        elements = newElements;
+
+        System.out.println(oldCapacity + "缩容为" + newCapacity);
     }
 }
