@@ -62,9 +62,42 @@ public class BinarySearchTree2<E> {
         return 0;
     }
 
-    public void remove(E element) {
+    public void remove(Node<E> node) {
+        if (node == null) return;
+        size--;
 
+        if (node.hasTwoChildren()) {// 度为2的节点
+            Node<E> s = successor(node); // 找到后继节点
+            node.element = s.element; // 用后继节点的值覆盖度为2的节点的值
+            node = s;  // 删除后继节点
+        }
+
+        // 删除node节点（node的度必然是1或者0）
+        Node<E> replacement = node.left != null ? node.left : node.right;
+        if (replacement != null) {// node是度为1的节点
+            // 更改parent
+            replacement.parent = node.parent;
+            // 更改parent的left、right的指向
+            if (node.parent == null) {// node是度为1的节点并且是根节点
+                root = replacement;
+            } else if (node == node.parent.left) {
+               node.parent.left = replacement;
+            } else if (node == node.parent.right) {
+                node.parent.right = replacement;
+            }
+
+        } else if (node.parent == null) {// node是叶子节点并且是根节点
+            root = null;
+        } else {// node是叶子节点，但不是根节点
+            if (node == node.parent.left) {
+                node.parent.left = null;
+            } else if (node == node.parent.right) {
+                node.parent.right = null;
+            }
+        }
     }
+
+
 
     private void preorderTraversal(Node<E> node) {
         if (node == null) return;
@@ -123,18 +156,22 @@ public class BinarySearchTree2<E> {
         //前驱节点在左子树当中（left.right.right.right....）
         Node<E> p = node.left;
         if (p != null) {
-            while (p.right != null) {
+            while(p.right != null) {
                 p = p.right;
             }
+
             return p;
         }
-        //如果node.left == null ，父节点不为空
-        //predecessor = node.parent.parent.parent。。。
-        if (node.parent != null && node == node.parent.left) {
+        // 从父节点、祖父节点中寻找前驱节点
+        //终结条件：node在parent的右子树中
+        while(node.parent != null && node == node.parent.left) {
             node = node.parent;
         }
 
-        return  node.parent;
+        //如果node.left == null ，父节点不为空
+        //predecessor = node.parent.parent.parent。。。
+        return node.parent;
+
     }
 
     //后继节点
@@ -181,6 +218,13 @@ public class BinarySearchTree2<E> {
         public Node(E element, Node<E> parent) {
             this.element = element;
             this.parent = parent;
+        }
+
+        private boolean hasTwoChildren() {
+
+            if (left != null && right != null) return true;
+
+            return false;
         }
     }
 
